@@ -1,6 +1,6 @@
 ## UI绘制流程及原理
 
-### View是如何被添加到屏幕窗口上
+### 一、View是如何被添加到屏幕窗口上
 
 1. 创建顶层布局容器DecorView
 2. 在顶层布局中加载基础布局ViewGroup
@@ -112,7 +112,7 @@ protected ViewGroup generateLayout(DecorView decor) {
 2. 当DecorView初始化完成后，系统会根据不同的主题特性去加载不同的基础容器。这个基础容器中，必定存在一个ID为com.android.internal.R.id.content的FrameLayout容器。
 3. 当setContentView方法传入的自己的布局资源ID，经过解析后add到FrameLayout中。
 
-### View的绘制流程
+### 二、View的绘制流程
 
 1、绘制入口
 
