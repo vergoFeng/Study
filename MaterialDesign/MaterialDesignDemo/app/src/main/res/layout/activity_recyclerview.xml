@@ -65,4 +65,14 @@
         </RelativeLayout>
     </FrameLayout>
 
+    <android.support.design.widget.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="16dp"
+        app:fabSize="auto"
+        android:src="@mipmap/ic_launcher_round"
+        app:layout_behavior="com.vergo.demo.materialdesign.behavior.ScaleBehavior"/>
+
 </android.support.design.widget.CoordinatorLayout>
