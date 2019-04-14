@@ -283,3 +283,4 @@ public class ScaleBehavior<V extends View> extends CoordinatorLayout.Behavior<V>
 
 显示效果
 
+![](images/behavior.gif)
