@@ -254,3 +254,31 @@ mPaint.setShader(shader);
 
 ![](images/paint_06.jpg)
 
+##### PorterDuff.Mode
+
+[官方文档](https://developer.android.google.cn/reference/android/graphics/PorterDuff.Mode.html)
+
+`PorterDuff.Mode` 是用来指定两个图像共同绘制时的颜色策略的。它是一个 enum，不同的 `Mode` 可以指定不同的策略。「颜色策略」的意思，就是说把源图像绘制到目标图像处时应该怎样确定二者结合后的颜色。
+
+`PorterDuff.Mode` 在 `Paint` 一共有三处 API ，它们的工作原理都一样，只是用途不同：
+
+| API                   | 用途                                         |
+| --------------------- | :------------------------------------------- |
+| ComposeShader         | 混合两个Shader                               |
+| PorterDuffColorFilter | 增加一个单色的ColorFilter                    |
+| Xfermode              | 设置绘制内容和 View 中已有内容的混合计算方式 |
+
+具体来说， `PorterDuff.Mode` 一共有 18 个，可以分为两类：
+
+1. Alpha 合成 (Alpha Compositing)
+2. 混合 (Blending)
+
+Alpha 合成：
+
+![img](http://ws3.sinaimg.cn/large/52eb2279ly1fig6im3hhcj20o50zt7bj.jpg)
+
+混合：
+
+![img](http://ws3.sinaimg.cn/large/52eb2279ly1fig6iw04v0j20ny0hzmzj.jpg)
+
+#### 2.4 setColorFilter(ColorFilter colorFilter)
