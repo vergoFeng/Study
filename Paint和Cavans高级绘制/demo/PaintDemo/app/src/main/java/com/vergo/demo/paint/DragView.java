@@ -53,7 +53,6 @@ public class DragView extends View {
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                Toast.makeText(mContext, "触摸在View内", Toast.LENGTH_SHORT).show();
                 downX = event.getX(); // 按下时x坐标
                 downY = event.getY(); // 按下时y坐标
                 break;

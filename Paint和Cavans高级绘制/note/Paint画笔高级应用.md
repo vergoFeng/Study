@@ -282,3 +282,119 @@ Alpha 合成：
 ![img](http://ws3.sinaimg.cn/large/52eb2279ly1fig6iw04v0j20ny0hzmzj.jpg)
 
 #### 2.4 setColorFilter(ColorFilter colorFilter)
+
+`ColorFilter` ：为绘制设置颜色过滤。就是为绘制的内容设置一个统一的过滤策略，然后 `Canvas.drawXXX()` 方法会对每个像素都进行过滤后再绘制出来。
+
+在 `Paint` 里设置 `ColorFilter` ，使用的是 `Paint.setColorFilter(ColorFilter filter)` 方法。 `ColorFilter` 并不直接使用，而是使用它的子类。它共有三个子类：`LightingColorFilter` `PorterDuffColorFilter` 和 `ColorMatrixColorFilter`。
+
+##### 2.4.1 LightingColorFilter
+
+这个 `LightingColorFilter` 是用来模拟简单的光照效果的。
+
+构造方法：
+
+```
+LightingColorFilter(int mul, int add)
+```
+
+参数：
+
+参数里的 `mul` 和 `add` 都是和颜色值格式相同的 int 值，其中 `mul` 用来和目标像素相乘，`add` 用来和目标像素相加：
+
+```
+R' = R * mul.R / 0xff + add.R
+G' = G * mul.G / 0xff + add.G
+B' = B * mul.B / 0xff + add.B
+```
+
+一个「保持原样」的「基本 `LightingColorFilter` 」，`mul` 为 `0xffffff`，`add` 为 `0x000000`（也就是0），那么对于一个像素，它的计算过程就是：
+
+```
+R' = R * 0xff / 0xff + 0x0 = R // R' = R  
+G' = G * 0xff / 0xff + 0x0 = G // G' = G  
+B' = B * 0xff / 0xff + 0x0 = B // B' = B  
+```
+
+基于这个「基本 `LightingColorFilter` 」，你就可以修改一下做出其他的 filter。比如，如果你想去掉原像素中的红色，可以把它的 `mul` 改为 `0x00ffff` （红色部分为 0 ） ，那么它的计算过程就是：
+
+```
+R' = R * 0x00 / 0xff + 0x0 = 0 // 红色被移除  
+G' = G * 0xff / 0xff + 0x0 = G  
+B' = B * 0xff / 0xff + 0x0 = B  
+```
+
+具体效果是这样的：
+
+```
+ColorFilter lightingColorFilter = new LightingColorFilter(0x00ffff, 0x000000);  
+paint.setColorFilter(lightingColorFilter);  
+```
+
+![](images/paint_07.jpg)
+
+##### 2.4.2 PorterDuffColorFilter
+
+使用一个指定的颜色和一种指定的 PorterDuff.Mode 来与绘制对象进行合成。
+
+构造方法：
+
+```
+PorterDuffColorFilter(int color, PorterDuff.Mode mode)
+```
+
+参数：
+
+color：具体的颜色值，例如Color.RED
+mode：指定 PorterDuff.Mode 混合模式。
+
+> 和 ComposeShader 不同的是，PorterDuffColorFilter 作为一个 ColorFilter，只能指定一种颜色作为源，而不是一个 Bitmap
+
+使用：
+
+```
+ColorFilter filter = new PorterDuffColorFilter(Color.RED, PorterDuff.Mode.DARKEN);  
+paint.setColorFilter(filter);  
+```
+
+##### 2.4.3 ColorMatrixColorFilter
+
+构造方法：
+
+```
+ColorMatrixColorFilter(@NonNull ColorMatrix matrix)
+ColorMatrixColorFilter(@NonNull float[] array)
+```
+
+参数：
+
+`ColorMatrixColorFilter` 使用一个 `ColorMatrix` 来对颜色进行处理。 `ColorMatrix` 这个类，内部是一个 4x5 的矩阵：
+
+```
+[ a, b, c, d, e,
+  f, g, h, i, j,
+  k, l, m, n, o,
+  p, q, r, s, t ]
+```
+
+通过计算， `ColorMatrix` 可以把要绘制的像素进行转换。对于颜色 [R, G, B, A] ，转换算法是这样的：
+
+```
+R’ = a*R + b*G + c*B + d*A + e;  
+G’ = f*R + g*G + h*B + i*A + j;  
+B’ = k*R + l*G + m*B + n*A + o;  
+A’ = p*R + q*G + r*B + s*A + t;  
+```
+
+使用：
+
+```
+final float[] COMMON = {
+	1, 0, 0, 0, 0,   // red
+	0, 1, 0, 0, 0,   // green
+	0, 0, 1, 0, 0,   // blue
+	0, 0, 0, 1, 0    // alpha
+};
+ColorFilter colorFilter = new ColorMatrixColorFilter(COMMON);
+mPaint.setColorFilter(colorFilter);
+```
+

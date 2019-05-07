@@ -1,5 +1,6 @@
 package com.vergo.demo.paint;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -7,11 +8,15 @@ import android.graphics.BitmapShader;
 import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
 import android.graphics.ComposeShader;
 import android.graphics.LightingColorFilter;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.RadialGradient;
 import android.graphics.Rect;
@@ -25,6 +30,8 @@ import android.view.View;
  */
 public class PaintView extends View {
     private Paint mPaint;
+    private Bitmap bitmap;
+
     public PaintView(Context context) {
         this(context, null);
     }
@@ -39,11 +46,13 @@ public class PaintView extends View {
     }
 
     private void init() {
+        bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.scenery);
+
         mPaint = new Paint(); //初始化
 //        mPaint.setColor(Color.RED);// 设置颜色
 //        mPaint.setARGB(255, 255, 0, 0); // 设置 Paint对象颜色,范围为0~255
 //        mPaint.setAlpha(200); // 设置alpha不透明度,范围为0~255
-//        mPaint.setAntiAlias(true); // 设置是否抗锯齿效果
+        mPaint.setAntiAlias(true); // 设置是否抗锯齿效果
 //
 //        // 画笔样式
 //        // Paint.Style.FILL：填充效果
@@ -65,8 +74,8 @@ public class PaintView extends View {
 //        mPaint.setStrokeJoin(Paint.Join.MITER);
 
 //         // 线性渐变
-        Shader linearShader = new LinearGradient(200, 200, 400, 400, Color.RED, Color.BLUE,
-                Shader.TileMode.CLAMP);
+//        Shader linearShader = new LinearGradient(200, 200, 400, 400, Color.RED, Color.BLUE,
+//                Shader.TileMode.CLAMP);
 
 //        // 辐射渐变
 //        Shader shader = new RadialGradient(300, 300, 200, Color.RED, Color.BLUE,
@@ -76,12 +85,12 @@ public class PaintView extends View {
 //        Shader shader = new SweepGradient(300, 300, Color.RED, Color.BLUE);
 
         // bitmap着色器
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.avatar);
-        Shader bitmapShader = new BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
+//        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.avatar);
+//        Shader bitmapShader = new BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
 
         // 组合着色器
-        Shader shader = new ComposeShader(linearShader, bitmapShader, PorterDuff.Mode.MULTIPLY);
-        mPaint.setShader(shader);
+//        Shader shader = new ComposeShader(linearShader, bitmapShader, PorterDuff.Mode.MULTIPLY);
+//        mPaint.setShader(bitmapShader);
 
 //        mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DARKEN)); //设置图层混合模式
 //        mPaint.setColorFilter(new LightingColorFilter(0x00ffff, 0x000000)); //设置颜色过滤器
@@ -103,7 +112,28 @@ public class PaintView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        canvas.drawRect(50, 50, 600, 600, mPaint);
+
+//        setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+
+//        Shader bitmapShader = new BitmapShader(bitmap, Shader.TileMode.MIRROR, Shader.TileMode.MIRROR);
+//        mPaint.setShader(bitmapShader);
+
+//        ColorFilter colorFilter = new LightingColorFilter(0xffffff, 0x000000);
+//        ColorFilter colorFilter = new PorterDuffColorFilter(Color.RED, PorterDuff.Mode.DARKEN);
+        final float[] COMMON = {
+                1, 0, 0, 0, 100,   // red
+                0, 1, 0, 0, 100,   // green
+                0, 0, 1, 0, 0,   // blue
+                0, 0, 0, 1, 0    // alpha
+        };
+
+        ColorMatrix colorMatrix = new ColorMatrix();
+        colorMatrix.setSaturation(0);
+        ColorFilter colorFilter = new ColorMatrixColorFilter(colorMatrix);
+        mPaint.setColorFilter(colorFilter);
+        canvas.drawBitmap(bitmap, 500, 100, mPaint);
+
+//        canvas.drawRect(0, 0, 300, 300, mPaint);
 //        canvas.drawCircle(300, 300, 300, mPaint);
     }
 }

@@ -17,7 +17,7 @@ public class MainActivity extends AppCompatActivity {
 //    @Override
 //    public boolean onTouchEvent(MotionEvent event) {
 //        if(event.getAction() == MotionEvent.ACTION_DOWN) {
-//            Toast.makeText(this, "触摸在View外", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(this, "手指触摸在控件范围外", Toast.LENGTH_SHORT).show();
 //        }
 //        return super.onTouchEvent(event);
 //    }
