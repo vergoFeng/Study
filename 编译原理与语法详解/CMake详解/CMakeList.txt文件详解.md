@@ -285,5 +285,80 @@ add_library(
         ${DIR_LIB_SRCS})
 ```
 
-### 添加预编译库（Android6.0以前版本）
+### 添加预编译库
 
+#### Android6.0版本以前
+
+- 假设我们本地项目引用了 libimported-lib.so。
+- 添加 add_library 命令，第一个参数是模块名，第二个参数 SHARED 表示动态库，STATIC 表示静态库，第三个参数 IMPORTAL 表示以导入的形式添加。
+- 添加 set_target_properties 命令设置导入路径属性。
+- 将 imported-lib 添加到 target_link_libraries 命令参数中，表示 native-lib 需要链接 imported-lib 模块。
+
+```cmake
+# 使用 IMPORTED 标志告知 CMake 只希望将库导入到项目中
+# 如果是静态库则将 SHARED 改为 STATIC
+add_library(
+        imported-lib
+        SHARED
+        IMPORTED)
+set_target_properties(
+        imported-lib    #库名
+        PROPERTIES      #属性
+        IMPORTED_LOCATION  #导入地址
+        库路径/libimported-lib.so  #库所在地址
+        
+aux_source_directory(. DIR_SRCS)
+add_library(
+        native-lib
+        SHARED
+        ${DIR_SRCS})
+target_link_libraries(native-lib imported-lib)
+)
+```
+
+#### Android6.0版本以后
+
+```cmake
+# set命令定义一个变量
+# CMAKE_C_FLAGS：c的全局变量，会传递给编译器
+# 如果是c++文件，需要用 CMAKE_CXX_FLAGS
+# -L：库的查找路径
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -L[SO所在目录]")
+```
+
+### 添加头文件目录
+
+为了确保CMake可以在编译时定位头文件，使用 include_directories，相当于g++选项中 -I 参数。
+这样就可以使用  #include<xx.h>，否则需要使用 #include “path/xx.h”
+
+```cmake
+# 设置头文件目录
+include_directories(<文件目录>)
+```
+
+### Build.gradle配置
+
+```
+android {
+    defaultConfig {
+        externalNativeBuild {
+            cmake {
+                // 使用的编译器clang/gcc
+                // cmake默认就是 gnustl_static
+                arguments "-DANDROID_TOOLCHAIN=clang", "-DANDROID_STL=gnustl_static"
+                cFlags ""
+                cppFlags ""
+                // 指定需要编译的cpu架构
+                abiFilters "armeabi-v7a"
+            }
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            // 指定CMakeList.txt文件相对于当前build.gradle的路径
+            path "src/main/cpp/CMakeLists.txt"
+        }
+    }
+}
+```
