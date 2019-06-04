@@ -3,11 +3,11 @@ package com.vergo.demo.ffmpeg;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
@@ -17,26 +17,22 @@ import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
 
-    private SurfaceView mSurfaceView;
-    private FFmpegPlayer fFmpegPlayer;
-
+    SurfaceView surfaceView;
+    WangyiPlayer wangyiPlayer;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
         setContentView(R.layout.activity_main);
-
-        mSurfaceView = findViewById(R.id.surfaceView);
-
-        fFmpegPlayer = new FFmpegPlayer();
-        fFmpegPlayer.setSurfaceView(mSurfaceView);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager
+                .LayoutParams.FLAG_KEEP_SCREEN_ON);
+        surfaceView = findViewById(R.id.surfaceView);
+        wangyiPlayer = new WangyiPlayer();
+        wangyiPlayer.setSurfaceView(surfaceView);
     }
 
     public void open(View view) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                 openLocalVideo();
             } else {
                 requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 123);
@@ -45,8 +41,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void openLocalVideo() {
-        File file = new File(Environment.getExternalStorageDirectory()+"/Movies", "input.mp4");
-        fFmpegPlayer.start(file.getAbsolutePath());
+        File file = new File(Environment.getExternalStorageDirectory(), "input.mp4");
+        wangyiPlayer.start(file.getAbsolutePath());
     }
 
     @Override
