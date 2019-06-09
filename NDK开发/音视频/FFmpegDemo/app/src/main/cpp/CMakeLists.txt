@@ -1,9 +1,8 @@
 cmake_minimum_required(VERSION 3.4.1)
 
-
 file(GLOB SOURCE *.cpp)
 add_library( # Sets the name of the library.
-        native-lib
+        player-lib
         SHARED
         ${SOURCE})
 find_library( # Sets the name of the path variable.
@@ -16,7 +15,7 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -L${CMAKE_SOURCE_DIR}/../jniLibs/${CMAKE_ANDROID_ARCH_ABI}")
 
 target_link_libraries( # Specifies the target library.
-        native-lib
+        player-lib
         avfilter avformat avcodec avutil swresample swscale
         ${log-lib}
         z

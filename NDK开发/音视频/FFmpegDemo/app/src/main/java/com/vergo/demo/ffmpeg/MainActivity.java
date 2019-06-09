@@ -19,6 +19,7 @@ public class MainActivity extends AppCompatActivity {
 
     SurfaceView surfaceView;
     WangyiPlayer wangyiPlayer;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,20 +41,39 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void soundDecode(View view) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                soundDecode();
+            } else {
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 456);
+            }
+        }
+    }
+
     private void openLocalVideo() {
         File file = new File(Environment.getExternalStorageDirectory(), "input.mp4");
         wangyiPlayer.start(file.getAbsolutePath());
     }
 
+    private void soundDecode() {
+        File file = new File(Environment.getExternalStorageDirectory(), "input.mp3");
+        File outputFile = new File(Environment.getExternalStorageDirectory(), "output.pcm");
+        wangyiPlayer.soundDecode(file.getAbsolutePath(), outputFile.getAbsolutePath());
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 123) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+        if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            if (requestCode == 123) {
                 openLocalVideo();
-            } else {
-                Toast.makeText(this, "权限被禁止，无法获取手机里视频", Toast.LENGTH_SHORT).show();
+            } else if (requestCode == 456) {
+                soundDecode();
             }
+        } else {
+            Toast.makeText(this, "权限被禁止，无法获取手机里视频", Toast.LENGTH_SHORT).show();
         }
     }
 }

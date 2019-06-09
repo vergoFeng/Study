@@ -24,6 +24,13 @@
         android:layout_height="50dp"
         android:gravity="center"
         android:onClick="open"
-        android:text="打开"/>
+        android:text="播放视频"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:gravity="center"
+        android:onClick="soundDecode"
+        android:text="音频解码"/>
 
 </LinearLayout>

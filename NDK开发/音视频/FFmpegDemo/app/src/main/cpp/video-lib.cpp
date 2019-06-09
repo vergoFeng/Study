@@ -56,19 +56,17 @@ Java_com_vergo_demo_ffmpeg_WangyiPlayer_native_1start(JNIEnv *env, jobject insta
     // 打开解码器
     avcodec_open2(avCodecContext, avCodec, NULL);
 
-    // 解码，从AVPacket中获取yuv数据
+    // 解码，
+    // 在解码过程中是看不到相关yuv的数据的，因为被封装成了AVPacket，所以要读取yuv数据必须从AVPacket中找
     // 实例化AVPacket对象
     AVPacket *avPacket = av_packet_alloc();
-    // 从视频流中读取数据包到AVPacket中
 
     // avCodecContext->pix_fmt当前视频的编码格式
-    // 重视速度：fast_bilinear, point
-    // 重视质量：cubic, spline, lanczos
-    // 缩小：
-    // 重视速度：fast_bilinear, point
-    // 重视质量：gauss, bilinear
-    // 重视锐度：cubic, spline, lanczos
-    // 得到一个转码上下文SwsContext
+    // flags：转换方式：
+    //  重视速度：fast_bilinear, point
+    //  重视质量：gauss, bilinear
+    //  重视锐度：cubic, spline, lanczos
+    //  得到一个转码上下文SwsContext
     SwsContext *swsContext = sws_getContext(avCodecContext->width, avCodecContext->height,
                                             avCodecContext->pix_fmt,
                                             avCodecContext->width, avCodecContext->height,
@@ -86,10 +84,12 @@ Java_com_vergo_demo_ffmpeg_WangyiPlayer_native_1start(JNIEnv *env, jobject insta
     uint8_t *dst_data[0];
     // 每一行的首地址
     int dst_linesize[0];
+    // 声明一个图片
     av_image_alloc(dst_data, dst_linesize, avCodecContext->width, avCodecContext->height,
                    AV_PIX_FMT_RGBA, 1);
 
-    // 返回值0：读取成功；<0：读取错误或者到文件末尾
+    // av_read_frame 从视频流中读取数据包到AVPacket中
+    // 返回值0：读取成功；< 0：读取错误或者到文件末尾
     while (av_read_frame(avFormatContext, avPacket) >= 0) {
         avcodec_send_packet(avCodecContext, avPacket);
 

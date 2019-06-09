@@ -6,7 +6,7 @@ import android.view.SurfaceView;
 
 public class WangyiPlayer implements SurfaceHolder.Callback{
     static {
-        System.loadLibrary("native-lib");
+        System.loadLibrary("player-lib");
     }
     private SurfaceHolder surfaceHolder;
     public void setSurfaceView(SurfaceView surfaceView) {
@@ -25,7 +25,21 @@ public class WangyiPlayer implements SurfaceHolder.Callback{
             }
         }).start();
     }
+
+    public void soundDecode(final String inputPath, final String outputPath) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                native_sound(inputPath, outputPath);
+            }
+        }).start();
+
+    }
+
     public  native void native_start(String path, Surface surface);
+
+    public  native void native_sound(String inputPath, String outputPath);
+
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
 
