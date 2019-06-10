@@ -85,6 +85,9 @@ ffmpeg -i input.mp4 -an -c:v rawvideo -pix_fmt yuv420p out.yuv
 -pix_fmt yuv420p：指定转换格式为yuv420p
 
 > 未经过编码的数据需要用到ffplay播放（ffplay -s 608*368 out.yuv）
+>
+> 如果报错："SDL_OpenAudio (2 channels, 44100 Hz): WASAPI can't initialize audio client"
+> 需要先设置环境一个变量SDL_AUDIODRIVER=directsound
 
 **提取PCM数据**
 
