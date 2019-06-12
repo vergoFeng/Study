@@ -8,10 +8,6 @@
 //#include <zconf.h>
 //#include <unistd.h>
 
-extern "C"{
-#include <libavcodec/avcodec.h>
-}
-
 #include "FFmpegControl.h"
 #include "JavaCallHelper.h"
 
@@ -19,6 +15,13 @@ JavaCallHelper *javaCallHelper;
 
 ANativeWindow *nativeWindow = 0;
 FFmpegControl *ffmpegControl;
+
+// native子线程要回调java层，需将native线程绑定到jvm
+JavaVM *javaVM = NULL;
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
+    javaVM = vm;
+    return JNI_VERSION_1_4;
+}
 
 extern "C"
 JNIEXPORT void JNICALL
@@ -38,8 +41,10 @@ Java_com_vergo_demo_ffmpeg_WangyiPlayer_native_1prepare(JNIEnv *env, jobject ins
                                                         jstring dataSource_) {
     const char *dataSource = env->GetStringUTFChars(dataSource_, 0);
 
+    javaCallHelper = new JavaCallHelper(javaVM, env, instance);
+
     // 实例化控制层，并初始化
-    ffmpegControl = new FFmpegControl(dataSource);
+    ffmpegControl = new FFmpegControl(javaCallHelper, dataSource);
     ffmpegControl->prepare();
 
     env->ReleaseStringUTFChars(dataSource_, dataSource);
@@ -49,6 +54,9 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_com_vergo_demo_ffmpeg_WangyiPlayer_native_1start(JNIEnv *env, jobject instance) {
 
-    // TODO
+    // 播放
+    if(ffmpegControl) {
+        ffmpegControl->start();
+    }
 
 }

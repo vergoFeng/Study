@@ -1,5 +1,5 @@
 //
-// Created by John on 2019/6/12.
+// Created by Huijun on 2019/6/12.
 //
 
 #ifndef FFMPEGDEMO_JAVACALLHELPER_H

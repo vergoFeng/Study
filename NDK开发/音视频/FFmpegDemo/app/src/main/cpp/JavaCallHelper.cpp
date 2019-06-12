@@ -1,8 +1,9 @@
 //
-// Created by John on 2019/6/12.
+// Created by Huijun on 2019/6/12.
 //
 
 #include "JavaCallHelper.h"
+#include "macro.h"
 
 JavaCallHelper::JavaCallHelper(JavaVM *_javaNm, JNIEnv *_env, jobject &_jobj) : javaVM(_javaNm), env(_env) {
     //  : javaVM(_javaNm), env(_env) 等于
@@ -25,13 +26,46 @@ JavaCallHelper::~JavaCallHelper() {
 }
 
 void JavaCallHelper::onPrepare(int thread) {
-
+    if(thread == THREAD_CHILD) {
+        JNIEnv *jniEnv;
+        // 绑定主线程
+        if(javaVM->AttachCurrentThread(&jniEnv, 0) != JNI_OK) {
+            return;
+        }
+        jniEnv->CallVoidMethod(jobj, jmid_prepare);
+        // 解绑
+        javaVM->DetachCurrentThread();
+    } else {
+        env->CallVoidMethod(jobj, jmid_prepare);
+    }
 }
 
 void JavaCallHelper::onProgress(int thread, int progress) {
-
+    if(thread == THREAD_CHILD) {
+        JNIEnv *jniEnv;
+        // 绑定主线程
+        if(javaVM->AttachCurrentThread(&jniEnv, 0) != JNI_OK) {
+            return;
+        }
+        jniEnv->CallVoidMethod(jobj, jmid_progress, progress);
+        // 解绑
+        javaVM->DetachCurrentThread();
+    } else {
+        env->CallVoidMethod(jobj, jmid_progress, progress);
+    }
 }
 
 void JavaCallHelper::onError(int thread, int code) {
-
+    if(thread == THREAD_CHILD) {
+        JNIEnv *jniEnv;
+        // 绑定主线程
+        if(javaVM->AttachCurrentThread(&jniEnv, 0) != JNI_OK) {
+            return;
+        }
+        jniEnv->CallVoidMethod(jobj, jmid_error, code);
+        // 解绑
+        javaVM->DetachCurrentThread();
+    } else {
+        env->CallVoidMethod(jobj, jmid_error, code);
+    }
 }
