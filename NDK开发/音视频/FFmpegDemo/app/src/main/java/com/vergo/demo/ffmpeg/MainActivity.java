@@ -11,14 +11,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.SeekBar;
 import android.widget.Toast;
 
 import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
 
-    SurfaceView surfaceView;
-    WangyiPlayer wangyiPlayer;
+    private SurfaceView surfaceView;
+    private SeekBar seekBar;
+
+    private WangyiPlayer wangyiPlayer;
+    private int progress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,9 +30,36 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager
                 .LayoutParams.FLAG_KEEP_SCREEN_ON);
+
         surfaceView = findViewById(R.id.surfaceView);
+        seekBar = findViewById(R.id.seekBar);
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
         wangyiPlayer = new WangyiPlayer();
         wangyiPlayer.setSurfaceView(surfaceView);
+
+        wangyiPlayer.setOnPreparelListener(new WangyiPlayer.OnPreparelListener() {
+            @Override
+            public void onPrepare() {
+                // 只有监听到ffmpeg准备成功之后再调用播放
+                wangyiPlayer.start();
+            }
+        });
     }
 
     public void open(View view) {
@@ -53,13 +84,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void openLocalVideo() {
         File file = new File(Environment.getExternalStorageDirectory(), "input.mp4");
-        wangyiPlayer.start(file.getAbsolutePath());
+        wangyiPlayer.prepare(file.getAbsolutePath());
     }
 
     private void soundDecode() {
         File file = new File(Environment.getExternalStorageDirectory(), "input.mp3");
         File outputFile = new File(Environment.getExternalStorageDirectory(), "output.pcm");
-        wangyiPlayer.soundDecode(file.getAbsolutePath(), outputFile.getAbsolutePath());
+//        wangyiPlayer.soundDecode(file.getAbsolutePath(), outputFile.getAbsolutePath());
     }
 
     @Override

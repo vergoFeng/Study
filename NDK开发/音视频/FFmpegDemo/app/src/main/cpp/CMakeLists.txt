@@ -5,9 +5,11 @@ add_library( # Sets the name of the library.
         player-lib
         SHARED
         ${SOURCE})
+
 find_library( # Sets the name of the path variable.
         log-lib
         log)
+
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
 #set(my_lib_path  ${CMAKE_SOURCE_DIR}/src/main/jniLibs/${ANDROID_ABI})
