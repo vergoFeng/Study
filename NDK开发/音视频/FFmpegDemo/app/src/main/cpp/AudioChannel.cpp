@@ -4,14 +4,16 @@
 
 #include "AudioChannel.h"
 
-AudioChannel::AudioChannel(int id, JavaCallHelper *callHelper, AVCodec *avCodec) {
+AudioChannel::AudioChannel(int id, AVCodecContext *codecContext, JavaCallHelper *callHelper,
+                           AVRational time_base) : BaseChannel(id, codecContext, callHelper,
+                                                               time_base) {
 
 }
 
-AudioChannel::~AudioChannel() {
+void AudioChannel::play() {
 
 }
 
-void AudioChannel::start() {
+void AudioChannel::stop() {
 
 }

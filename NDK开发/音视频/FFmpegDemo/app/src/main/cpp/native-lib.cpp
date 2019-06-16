@@ -4,7 +4,7 @@
 //
 #include <jni.h>
 #include <string>
-#include <android/native_window_jni.h>
+#include <android/native_window.h>
 //#include <zconf.h>
 //#include <unistd.h>
 
@@ -15,6 +15,11 @@ JavaCallHelper *javaCallHelper;
 
 ANativeWindow *nativeWindow = 0;
 FFmpegControl *ffmpegControl;
+
+void renderFrame(uint8_t *data, int linesize, int width, int height) {
+    // 渲染
+
+}
 
 // native子线程要回调java层，需将native线程绑定到jvm
 JavaVM *javaVM = NULL;
@@ -45,6 +50,7 @@ Java_com_vergo_demo_ffmpeg_WangyiPlayer_native_1prepare(JNIEnv *env, jobject ins
 
     // 实例化控制层，并初始化
     ffmpegControl = new FFmpegControl(javaCallHelper, dataSource);
+    ffmpegControl->setRenderCallback(renderFrame);
     ffmpegControl->prepare();
 
     env->ReleaseStringUTFChars(dataSource_, dataSource);

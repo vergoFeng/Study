@@ -13,11 +13,6 @@
 #include "VideoChannel.h"
 #include "AudioChannel.h"
 
-extern "C" {
-#include <libavformat/avformat.h>
-#include <libavutil/time.h>
-};
-
 // 控制层
 class FFmpegControl {
 public:
@@ -27,6 +22,9 @@ public:
     void prepare();
     void prepareFFmpeg();
     void start();
+    void readFrame();
+
+    void setRenderCallback(RenderFrame renderFrame);
 
 private:
     char *url;
@@ -34,6 +32,9 @@ private:
 
     // 准备线程
     pthread_t prepare_thread;
+    // 解码线程，直到播放完毕才销毁
+    pthread_t pid_decode;
+
     // 总上下文
     AVFormatContext *formatContext;
     // 回调java层
@@ -42,6 +43,8 @@ private:
     VideoChannel *videoChannel;
     // 音频解码播放
     AudioChannel *audioChannel;
+
+    RenderFrame renderFrame;
 };
 
 

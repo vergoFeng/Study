@@ -10,7 +10,13 @@ void *prepareFFmpeg_(void *args) {
     FFmpegControl *ffmpegControl = static_cast<FFmpegControl *>(args);
     ffmpegControl->prepareFFmpeg();
 
-    //
+    // 线程函数要返回0
+    return 0;
+}
+
+void *decodeThread(void *args) {
+    FFmpegControl *ffmpegControl = static_cast<FFmpegControl *>(args);
+    ffmpegControl->readFrame();
     return 0;
 }
 
@@ -103,10 +109,11 @@ void FFmpegControl::prepareFFmpeg() {
 
         if(codecParameters->codec_type == AVMEDIA_TYPE_VIDEO) {
             // 视频流
-            videoChannel = new VideoChannel(0, codecContext, javaCallHelper, stream->time_base);
+            videoChannel = new VideoChannel(i, codecContext, javaCallHelper, stream->time_base);
+            videoChannel->setRenderCallback(renderFrame);
         } else if(codecParameters->codec_type == AVMEDIA_TYPE_AUDIO) {
             // 音频流
-            audioChannel = new AudioChannel(i, javaCallHelper, codec);
+            audioChannel = new AudioChannel(i, codecContext, javaCallHelper, stream->time_base);
         }
     }
 
@@ -129,4 +136,54 @@ void FFmpegControl::start() {
 //    if(audioChannel) {
 //        audioChannel->play();
 //    }
+
+    pthread_create(&pid_decode, NULL, decodeThread, this);
+}
+
+void FFmpegControl::readFrame() {
+    int ret = 0;
+
+    while (isPlaying) {
+
+        // 当packet队列大小大于100时，休眠避免oom
+        if(videoChannel && videoChannel->packet_queue.size() > 100) {
+            // 因为生产者的生产速度远远大于消费者的消费速度，这里休眠10ms
+            av_usleep(10 * 1000);
+            continue;
+        }
+        if(audioChannel && audioChannel->packet_queue.size() > 100) {
+            av_usleep(10 * 1000);
+            continue;
+        }
+
+        AVPacket *packet = av_packet_alloc();
+        // 读取音视频数据包
+        ret = av_read_frame(formatContext, packet);
+
+        if(ret == 0) {
+            // 将数据包加入packet队列
+            if(videoChannel && packet->stream_index == videoChannel->channelId) {
+                videoChannel->packet_queue.enQueue(packet);
+            } else if(audioChannel && packet->stream_index == audioChannel->channelId) {
+                audioChannel->packet_queue.enQueue(packet);
+            }
+        } else if(ret == AVERROR_EOF) {
+            // 读取完毕，但是不一定播放完毕
+            if(videoChannel->packet_queue.empty() && videoChannel->frame_queue.empty()
+            && audioChannel->packet_queue.empty() && audioChannel->frame_queue.empty()) {
+                // 播放完毕
+                break;
+            }
+        } else {
+            break;
+        }
+    }
+
+    isPlaying = 0;
+    audioChannel->stop();
+    videoChannel->stop();
+}
+
+void FFmpegControl::setRenderCallback(RenderFrame renderFrame) {
+    this->renderFrame = renderFrame;
 }

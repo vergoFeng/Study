@@ -10,6 +10,9 @@
 
 extern "C"{
 #include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
+#include <libswscale/swscale.h>
+#include <libavutil/time.h>
 };
 
 class BaseChannel {
@@ -27,6 +30,19 @@ public:
         }
         packet_queue.clear();
         frame_queue.clear();
+    }
+
+    static void releasePacket(AVPacket *&packet) {
+        if(packet) {
+            av_packet_free(&packet);
+            packet = 0;
+        }
+    }
+    static void releaseFrame(AVFrame *&frame) {
+        if(frame) {
+            av_frame_free(&frame);
+            frame = 0;
+        }
     }
 
     // 虚函数，播放和暂停

@@ -5,15 +5,16 @@
 #ifndef FFMPEGDEMO_AUDIOCHANNEL_H
 #define FFMPEGDEMO_AUDIOCHANNEL_H
 
+#include <pthread.h>
 #include "JavaCallHelper.h"
-#include <libavcodec/avcodec.h>
+#include "BaseChannel.h"
 
-class AudioChannel {
+class AudioChannel : public BaseChannel{
 public:
-    AudioChannel(int id, JavaCallHelper *callHelper, AVCodec *avCodec);
-    ~AudioChannel();
+    AudioChannel(int id, AVCodecContext *codecContext, JavaCallHelper *callHelper, AVRational time_base);
 
-    void start();
+    void play() override;
+    void stop() override;
 };
 
 
