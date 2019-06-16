@@ -19,6 +19,27 @@ FFmpegControl *ffmpegControl;
 void renderFrame(uint8_t *data, int linesize, int width, int height) {
     // 渲染
 
+    // 设置缓冲区
+    ANativeWindow_setBuffersGeometry(nativeWindow, width, height, WINDOW_FORMAT_RGBA_8888);
+    ANativeWindow_Buffer window_buffer;
+
+    if(ANativeWindow_lock(nativeWindow, &window_buffer, 0)) {
+        ANativeWindow_release(nativeWindow);
+        nativeWindow = 0;
+        return;
+    }
+
+    // 缓冲区
+    uint8_t *window_data = static_cast<uint8_t *>(window_buffer.bits);
+    int window_linesize = window_buffer.stride * 4;
+    uint8_t *src_data = data;
+
+    for (int i = 0; i < window_buffer.height; ++i) {
+        memcpy(window_data + i * window_linesize, src_data + i * linesize, window_linesize);
+    }
+
+    // 解锁NativeWindow
+    ANativeWindow_unlockAndPost(nativeWindow);
 }
 
 // native子线程要回调java层，需将native线程绑定到jvm

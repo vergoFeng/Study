@@ -7,7 +7,6 @@
 VideoChannel::VideoChannel(int id, AVCodecContext *codecContext, JavaCallHelper *callHelper,
                            AVRational time_base) : BaseChannel(id, codecContext, callHelper,
                                                                time_base) {
-
 }
 
 void *decode(void *args ) {
@@ -40,12 +39,12 @@ void VideoChannel::stop() {
 }
 
 void VideoChannel::decodePacket() {
-    AVPacket *packet = av_packet_alloc();
+    AVPacket *packet = 0;
     while (isPlaying) {
-        if(frame_queue.size() > 100) {
-            av_usleep(10 * 1000);
-            continue;
-        }
+//        if(frame_queue.size() > 100) {
+//            av_usleep(10 * 1000);
+//            continue;
+//        }
 
         int ret = packet_queue.deQueue(packet);
         if(!isPlaying) {
@@ -69,8 +68,12 @@ void VideoChannel::decodePacket() {
 
         AVFrame *frame = av_frame_alloc();
         ret = avcodec_receive_frame(codecContext, frame);
-        if(ret == 0) {
+//        if(ret == 0) {
             frame_queue.enQueue(frame);
+//        }
+        while (frame_queue.size() > 100 && isPlaying) {
+            av_usleep(1000 * 10);
+            continue;
         }
     }
     // 保险起见

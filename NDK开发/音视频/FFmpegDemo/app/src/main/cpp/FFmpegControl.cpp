@@ -165,7 +165,7 @@ void FFmpegControl::readFrame() {
             if(videoChannel && packet->stream_index == videoChannel->channelId) {
                 videoChannel->packet_queue.enQueue(packet);
             } else if(audioChannel && packet->stream_index == audioChannel->channelId) {
-                audioChannel->packet_queue.enQueue(packet);
+//                audioChannel->packet_queue.enQueue(packet);
             }
         } else if(ret == AVERROR_EOF) {
             // 读取完毕，但是不一定播放完毕

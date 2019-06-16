@@ -19,7 +19,8 @@ class BaseChannel {
 public:
     BaseChannel(int id, AVCodecContext *codecContext, JavaCallHelper *callHelper,
             AVRational time_base) : channelId(id),codecContext(codecContext),callHelper(callHelper) {
-
+//        packet_queue.setReleaseHandle(releasePacket);
+//        frame_queue.setReleaseHandle(releaseFrame);
     }
 
     virtual ~BaseChannel() {
