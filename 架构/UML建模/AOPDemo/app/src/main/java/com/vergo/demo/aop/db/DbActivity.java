@@ -16,7 +16,7 @@ public class DbActivity extends AppCompatActivity implements IDbOperation{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_db);
 
         iDbOperation = (IDbOperation) Proxy.newProxyInstance(IDbOperation.class.getClassLoader(),
                 new Class[]{IDbOperation.class}, new DbHandler(this));
