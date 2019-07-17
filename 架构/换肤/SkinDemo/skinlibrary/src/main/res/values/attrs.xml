@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="SkinTextView">
+        <attr name="android:background"/>
+        <attr name="android:textColor" />
+        <!--字体属性-->
+        <attr name="custom_typeface" />
+    </declare-styleable>
+</resources>
