@@ -1,30 +1,64 @@
 package com.vergo.skin.library.core;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatViewInflater;
 import android.util.AttributeSet;
 import android.view.View;
 
-import com.vergo.skin.library.view.SkinTextView;
+import com.vergo.skin.library.view.SkinnableButton;
+import com.vergo.skin.library.view.SkinnableImageView;
+import com.vergo.skin.library.view.SkinnableLinearLayout;
+import com.vergo.skin.library.view.SkinnableRelativeLayout;
+import com.vergo.skin.library.view.SkinnableTextView;
 
 /**
- * 换肤时控件加载器
- * <p>Created by Fenghj on 2019/7/17.</p>
+ * 自定义控件加载器（可以考虑该类不被继承）
  */
-public class ChangeSkinViewInflater {
-    /**
-     * 自动匹配控件名，并初始化控件对象
-     * @param name      控件名
-     * @param context   上下文
-     * @param attrs     某控件对应所有属性
-     * @return 控件
-     */
-    public View createView(String name, Context context, AttributeSet attrs) {
-        View view = null;
+public final class ChangeSkinViewInflater extends AppCompatViewInflater {
 
+    private String name; // 控件名
+    private Context context; // 上下文
+    private AttributeSet attrs; // 某控件对应所有属性
+
+    public ChangeSkinViewInflater(@NonNull Context context) {
+        this.context = context;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setAttrs(AttributeSet attrs) {
+        this.attrs = attrs;
+    }
+
+    /**
+     * @return 自动匹配控件名，并初始化控件对象
+     */
+    public View autoMatch() {
+        View view = null;
         switch (name) {
+            case "LinearLayout":
+                // view = super.createTextView(context, attrs); // 源码写法
+                view = new SkinnableLinearLayout(context, attrs);
+                this.verifyNotNull(view, name);
+                break;
+            case "RelativeLayout":
+                view = new SkinnableRelativeLayout(context, attrs);
+                this.verifyNotNull(view, name);
+                break;
             case "TextView":
-                view = new SkinTextView(context, attrs);
-                verifyNotNull(view, name);
+                view = new SkinnableTextView(context, attrs);
+                this.verifyNotNull(view, name);
+                break;
+            case "ImageView":
+                view = new SkinnableImageView(context, attrs);
+                this.verifyNotNull(view, name);
+                break;
+            case "Button":
+                view = new SkinnableButton(context, attrs);
+                this.verifyNotNull(view, name);
                 break;
         }
 

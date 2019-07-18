@@ -10,7 +10,15 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:background=""
+        android:background="@color/colorPrimary"
+        android:gravity="center"
+        android:textColor="#fff"
         android:text="Hello World!"/>
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:onClick="dayOrNight"
+        android:text="日/夜切换"/>
 </RelativeLayout>
