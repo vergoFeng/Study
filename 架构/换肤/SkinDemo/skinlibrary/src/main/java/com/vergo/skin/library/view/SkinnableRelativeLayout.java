@@ -8,6 +8,7 @@ import android.util.AttributeSet;
 import android.widget.RelativeLayout;
 
 import com.vergo.skin.library.R;
+import com.vergo.skin.library.SkinManager;
 import com.vergo.skin.library.core.ViewsMatch;
 import com.vergo.skin.library.model.AttrsBean;
 
@@ -45,11 +46,26 @@ public class SkinnableRelativeLayout extends RelativeLayout implements ViewsMatc
         // 根据styleable获取控件某属性的resourceId
         int backgroundResourceId = attrsBean.getViewResource(key);
         if (backgroundResourceId > 0) {
-            // 兼容包转换
-            Drawable drawable = ContextCompat.getDrawable(getContext(), backgroundResourceId);
-            // 控件自带api，这里不用setBackgroundColor()因为在9.0测试不通过
-            // setBackgroundDrawable在这里是过时了
-            setBackground(drawable);
+            // 是否默认皮肤
+            if (SkinManager.getInstance().isDefaultSkin()) {
+                // 兼容包转换
+                Drawable drawable = ContextCompat.getDrawable(getContext(), backgroundResourceId);
+                // 控件自带api，这里不用setBackgroundColor()因为在9.0测试不通过
+                // setBackgroundDrawable在这里是过时了
+                setBackground(drawable);
+            } else {
+                // 获取皮肤包资源
+                Object skinResourceId = SkinManager.getInstance().getBackgroundOrSrc(backgroundResourceId);
+                // 兼容包转换
+                if (skinResourceId instanceof Integer) {
+                    int color = (int) skinResourceId;
+                    setBackgroundColor(color);
+                    // setBackgroundResource(color); // 未做兼容测试
+                } else {
+                    Drawable drawable = (Drawable) skinResourceId;
+                    setBackground(drawable);
+                }
+            }
         }
     }
 }

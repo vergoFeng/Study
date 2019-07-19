@@ -10,7 +10,7 @@ public class NavigationUtils {
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public static void forNavigation(Activity activity) {
         TypedArray a = activity.getTheme().obtainStyledAttributes(0, new int[] {
-                android.R.attr.statusBarColor
+                android.R.attr.navigationBarColor
         });
         int color = a.getColor(0, 0);
         activity.getWindow().setNavigationBarColor(color);

@@ -1,7 +1,6 @@
 package com.vergo.skin.library.core;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatViewInflater;
 import android.util.AttributeSet;
 import android.view.View;
@@ -17,26 +16,14 @@ import com.vergo.skin.library.view.SkinnableTextView;
  */
 public final class ChangeSkinViewInflater extends AppCompatViewInflater {
 
-    private String name; // 控件名
-    private Context context; // 上下文
-    private AttributeSet attrs; // 某控件对应所有属性
-
-    public ChangeSkinViewInflater(@NonNull Context context) {
-        this.context = context;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setAttrs(AttributeSet attrs) {
-        this.attrs = attrs;
-    }
-
     /**
-     * @return 自动匹配控件名，并初始化控件对象
+     * 自动匹配控件名，并初始化控件对象
+     * @param name     控件名
+     * @param context  上下文
+     * @param attrs    某控件对应所有属性
+     * @return 控件
      */
-    public View autoMatch() {
+    public View createView(String name, Context context, AttributeSet attrs) {
         View view = null;
         switch (name) {
             case "LinearLayout":

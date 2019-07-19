@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v4.view.LayoutInflaterCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
@@ -12,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.vergo.skin.library.SkinManager;
 import com.vergo.skin.library.core.ChangeSkinViewInflater;
 import com.vergo.skin.library.core.ViewsMatch;
 import com.vergo.skin.library.utils.ActionBarUtils;
@@ -42,11 +44,9 @@ public class SkinActivity extends AppCompatActivity {
     public View onCreateView(View parent, String name, Context context, AttributeSet attrs) {
         if (openChangeSkin()) {
             if (viewInflater == null) {
-                viewInflater = new ChangeSkinViewInflater(context);
+                viewInflater = new ChangeSkinViewInflater();
             }
-            viewInflater.setName(name);
-            viewInflater.setAttrs(attrs);
-            return viewInflater.autoMatch();
+            return viewInflater.createView(name, context, attrs);
         }
         return super.onCreateView(parent, name, context, attrs);
     }
@@ -74,13 +74,35 @@ public class SkinActivity extends AppCompatActivity {
         }
 
         View decorView = getWindow().getDecorView();
-        applyDayNightForView(decorView);
+        applyViews(decorView);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    protected void defaultSkin(int themeColorId) {
+        this.skinDynamic(null, themeColorId);
+    }
+
+    /**
+     * 动态换肤（api限制：5.0版本）
+     */
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    protected void skinDynamic(String skinPath, int themeColorId) {
+        SkinManager.getInstance().loaderSkinResources(skinPath);
+
+        if (themeColorId != 0) {
+            int themeColor = SkinManager.getInstance().getColor(themeColorId);
+            StatusBarUtils.forStatusBar(this, themeColor);
+            NavigationUtils.forNavigation(this, themeColor);
+            ActionBarUtils.forActionBar(this, themeColor);
+        }
+
+        applyViews(getWindow().getDecorView());
     }
 
     /**
      * 回调接口 给具体控件换肤操作
      */
-    protected void applyDayNightForView(View view) {
+    protected void applyViews(View view) {
         if (view instanceof ViewsMatch) {
             ViewsMatch viewsMatch = (ViewsMatch) view;
             viewsMatch.skinnableView();
@@ -90,7 +112,7 @@ public class SkinActivity extends AppCompatActivity {
             ViewGroup parent = (ViewGroup) view;
             int childCount = parent.getChildCount();
             for (int i = 0; i < childCount; i++) {
-                applyDayNightForView(parent.getChildAt(i));
+                applyViews(parent.getChildAt(i));
             }
         }
     }
