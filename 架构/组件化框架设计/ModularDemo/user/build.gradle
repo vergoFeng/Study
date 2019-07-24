@@ -1,0 +1,60 @@
+if(isLibrary) {
+    apply plugin: 'com.android.library'
+} else {
+    apply plugin: 'com.android.application'
+}
+
+android {
+    compileSdkVersion rootProject.ext.androidConfig.compileSdkVersion
+    buildToolsVersion rootProject.ext.androidConfig.buildToolsVersion
+    defaultConfig {
+        if(!isLibrary) {
+            // 如果是集成化模式，不能有applicationId
+            // 组件化模式能独立运行才能有applicationId
+            applicationId rootProject.ext.appId.user
+        }
+
+        minSdkVersion rootProject.ext.androidConfig.minSdkVersion
+        targetSdkVersion rootProject.ext.androidConfig.targetSdkVersion
+        versionCode rootProject.ext.androidConfig.versionCode
+        versionName rootProject.ext.androidConfig.versionName
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        // 这个方法接收三个非空的参数，第一个：确定值的类型，第二个：指定key的名字，第三个：传值（必须是String）
+        // 为什么需要定义这个？因为src代码中有可能需要用到跨模块交互，如果是组件化模块显然不行
+        // 切记：不能在android根节点，只能在defaultConfig或buildTypes节点下
+        buildConfigField ("boolean", "isLibrary", String.valueOf(isLibrary))
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    sourceSets {
+        main {
+            if(isLibrary) {
+                // 集成化模式，整个项目打包apk
+                manifest.srcFile 'src/main/AndroidManifest.xml'
+
+                // release 时 debug 目录下文件不需要合并到主工程
+                java {
+                    exclude '**/debug/**'
+                }
+            } else {
+                // 组件化模式，需要单独运行时
+                manifest.srcFile 'src/main/debug/AndroidManifest.xml'
+            }
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation rootProject.ext.dependencies.appcompat
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+}

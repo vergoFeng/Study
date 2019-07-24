@@ -1,0 +1,38 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion rootProject.ext.androidConfig.compileSdkVersion
+    buildToolsVersion rootProject.ext.androidConfig.buildToolsVersion
+    defaultConfig {
+        applicationId rootProject.ext.appId.app
+        minSdkVersion rootProject.ext.androidConfig.minSdkVersion
+        targetSdkVersion rootProject.ext.androidConfig.targetSdkVersion
+        versionCode rootProject.ext.androidConfig.versionCode
+        versionName rootProject.ext.androidConfig.versionName
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        buildConfigField ("boolean", "isLibrary", String.valueOf(isLibrary))
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation rootProject.ext.dependencies.appcompat
+    implementation rootProject.ext.dependencies.constraint
+
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+
+    // 如果是集成化模式，做发布版本时。各个模块都不能独立运行了
+    if(isLibrary) {
+        implementation project(':user')
+    }
+}
