@@ -1,1 +1,1 @@
-include ':app', ':user'
+include ':app', ':user', ':frouter_annotation', ':frouter_compiler', ':common', ':frouter_api'
