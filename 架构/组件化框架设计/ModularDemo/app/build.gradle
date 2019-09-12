@@ -29,6 +29,7 @@ dependencies {
 
     testImplementation 'junit:junit:4.12'
 
+//    annotationProcessor project(':frouter_compiler') // 注解处理器
     implementation project(':common')
     // 如果是集成化模式，做发布版本时。各个模块都不能独立运行了
     if(isLibrary) {
