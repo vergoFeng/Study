@@ -1,4 +1,4 @@
-package com.vergo.modular.product.test;
+package com.vergo.modular.user.test;
 
 import com.vergo.froute.annotation.enums.RouterType;
 import com.vergo.froute.annotation.model.RouterBean;

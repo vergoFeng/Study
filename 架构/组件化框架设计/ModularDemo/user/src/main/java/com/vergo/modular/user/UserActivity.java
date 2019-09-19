@@ -11,6 +11,11 @@ import com.vergo.froute.annotation.FRouter;
  */
 @FRouter(path = "/user/UserActivity")
 public class UserActivity extends AppCompatActivity {
+
+    String userid;
+    String username;
+    int age;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

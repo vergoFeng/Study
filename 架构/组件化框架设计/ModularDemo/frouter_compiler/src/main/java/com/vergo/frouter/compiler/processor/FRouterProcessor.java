@@ -7,6 +7,7 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
+import com.squareup.javapoet.WildcardTypeName;
 import com.vergo.froute.annotation.FRouter;
 import com.vergo.froute.annotation.enums.RouterType;
 import com.vergo.froute.annotation.model.RouterBean;
@@ -116,7 +117,9 @@ public class FRouterProcessor extends AbstractProcessor {
      * @param elements
      */
     private void parseElements(Set<? extends Element> elements) {
+        // 通过Element工具类，获取Activity、Callback类型
         TypeElement activityElement = mElements.getTypeElement(Constants.ACTIVITY);
+        // 显示类信息（获取被注解节点，类节点）这里也叫自描述 Mirror
         TypeMirror activityMirror = activityElement.asType();
 
         for (Element element : elements) {
@@ -238,7 +241,6 @@ public class FRouterProcessor extends AbstractProcessor {
                 ClassName.get(Map.class),
                 ClassName.get(String.class),
                 ClassName.get(RouterBean.class));
-
         // 遍历分组，每一个分组创建一个路径类文件，如：FRouter$$Path$$user
         for (Map.Entry<String, List<RouterBean>> stringListEntry : tempPathMap.entrySet()) {
             // 方法配置：public Map<String, RouterBean> loadPath()
@@ -300,6 +302,57 @@ public class FRouterProcessor extends AbstractProcessor {
     }
 
     private void createGroupFile(TypeElement groupTypeElement, TypeElement pathTypeElement) {
+        if(EmptyUtils.isEmpty(tempGroupMap) || EmptyUtils.isEmpty(tempPathMap)) return;
 
+        // 1、构建方法
+        // 方法的返回值类型 Map<String, Class<? extends FRouterLoadPath>>
+        TypeName methodReturn = ParameterizedTypeName.get(
+                ClassName.get(Map.class),
+                ClassName.get(String.class),
+                ParameterizedTypeName.get(ClassName.get(Class.class),
+                        WildcardTypeName.subtypeOf(ClassName.get(pathTypeElement)))
+        );
+        // 方法配置：Map<String, Class<? extends FRouterLoadPath>> loadGroup()
+        MethodSpec.Builder methodSpecBuilder = MethodSpec.methodBuilder(Constants.GROUP_METHOD_NAME)
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
+                .returns(methodReturn);
+        // 遍历之前：Map<String, Class<? extends FRouterLoadPath>> groupMap = new HashMap<>();
+        methodSpecBuilder.addStatement("$T<$T, $T> $N = new $T<>()",
+                ClassName.get(Map.class),
+                ClassName.get(String.class),
+                ParameterizedTypeName.get(ClassName.get(Class.class),
+                        WildcardTypeName.subtypeOf(ClassName.get(pathTypeElement))),
+                Constants.GROUP_PARAMETER_NAME,
+                HashMap.class);
+
+        for (Map.Entry<String, String> entry : tempGroupMap.entrySet()) {
+            // groupMap.put("user", FRouter$$Path$$user.class);
+            methodSpecBuilder.addStatement("$N.put($S, $T.class)",
+                    Constants.GROUP_PARAMETER_NAME,
+                    entry.getKey(),
+                    ClassName.get(packageNameForAPT, entry.getValue()));
+        }
+
+        methodSpecBuilder.addStatement("return $N", Constants.GROUP_PARAMETER_NAME);
+
+        // 2、构建类
+        String finalClassName = Constants.GROUP_FILE_NAME + moduleName;
+        TypeSpec typeSpec = TypeSpec.classBuilder(finalClassName)
+                .addModifiers(Modifier.PUBLIC)
+                .addSuperinterface(ClassName.get(groupTypeElement))
+                .addMethod(methodSpecBuilder.build())
+                .build();
+
+        // 3、构建包
+        JavaFile javaFile = JavaFile.builder(packageNameForAPT, typeSpec)
+                .build();
+
+        // 4、写入到文件生成器
+        try {
+            javaFile.writeTo(mFiler);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
