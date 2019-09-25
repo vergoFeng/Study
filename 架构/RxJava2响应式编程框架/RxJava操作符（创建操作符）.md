@@ -2,6 +2,8 @@
 
 ### 创建操作符
 
+专门创建 Observable 被观察者。
+
 #### 1、create操作符
 
 ```java
