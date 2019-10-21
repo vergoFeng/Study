@@ -8,6 +8,24 @@ APT(Annotation Processing Tool)
 
 也可以这样理解，只有通过声明APT工具后，程序在编译期自定义注解解释器才能执行。
 
+#### Element程序元素
+
+- PackagElement
+
+  表示一个包程序元素。提供对有关包及其成员的信息的访问。
+
+- TypeElement
+
+  表示一个类或接口程序元素。提供有关类及其成员的信息的访问。
+
+- ExecuteableElement
+
+  表示一个类或接口的方法、构造方法或初始化程序（静态或实例）
+
+- VariableElement
+
+  表示一个字段、enum常量、方法或构造方法参数、局部变量或异常参数。
+
 #### 常用API
 
 | 属性名                | 说明                                                |
